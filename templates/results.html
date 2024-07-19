@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Results - VeggieVision</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('vegetables.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container {
+            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: linear-gradient(45deg, #28a745, #4CAF50);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .card-header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+        .list-group-item {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: none;
+        }
+        .list-group-item strong {
+            font-size: 1.25rem;
+            color: #333;
+        }
+        .list-group-item .badge {
+            font-size: 1.25rem;
+            background-color: #28a745;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #ccc;
+        }
+        .btn {
+            font-size: 1.25rem;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .card {
+            animation: fadeIn 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h1>Detection Results</h1>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 text-center">
+                    <img src="{{ url_for('output_file', filename=filename) }}" class="img-fluid" alt="Processed Image">
+                </div>
+                <h2 class="text-center">Detected Vegetables</h2>
+                {% if detected_info %}
+                    <ul class="list-group">
+                        {% for veg, info in detected_info.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <strong>{{ veg }}</strong>
+                                <span class="badge badge-success badge-pill">{{ info['count'] }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-center">No vegetables were selected for detection.</p>
+                {% endif %}
+                <a href="{{ url_for('index') }}" class="btn btn-success btn-block mt-3">Back to Upload</a>
+            </div>
+        </div>
+        <footer class="mt-5">
+            <h5>Created by <a href="https://github.com/HARSHA152003/Veggie_Vision">VIT_CH_Boyz</a> | Powered by YOLOv8</h5>
+        </footer>
+    </div>
+</body>
+</html>

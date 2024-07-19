@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeggieVision</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            background-image: url('{{ url_for('static', filename='images/bgv.jpg') }}');
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .responsive-logo {
+            background-color: #000;
+            max-width: 100%;
+            height: auto;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .card-header {
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 128, 0, 0.8);
+        }
+        .card-header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            font-weight: bold;
+            color: #fff;
+        }
+        .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+        .card-body h3 {
+            color: #000;
+        }
+        .card-body p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .vegetable-instructions {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+        .btn-secondary-custom {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary-custom:hover {
+            background-color: #5a6268;
+        }
+        .form-check-label {
+            margin-left: 0.5rem;
+            color: #333;
+        }
+        .preview img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background-color: #f8f9fa; /* You can replace this color with any color you prefer */
+            padding: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #000;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .card {
+            animation: fadeIn 1s ease-in-out;
+        }
+        .form-group {
+            margin-bottom: 2.5rem;
+            text-align: left;
+        }
+        .form-check {
+            margin-bottom: 0.5rem;
+            font-size: x-large;
+        }
+        .btn-block {
+            margin-top: 20px;
+        }
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .form-container label {
+            flex: 1;
+        }
+        .form-container input, .form-container button {
+            flex: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="responsive-logo">
+            </div>
+            <div class="card-body">
+                <h3>INSTANTLY KNOW THE COUNT OF VEGETABLES</h3>
+                <p class="warning">This is a beta model. The main model is under development.</p>
+                <form id="uploadForm" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group form-container">
+                        <input type="file" class="form-control-file btn-secondary-custom" id="file" name="file" accept="image/*" required>
+                    </div>
+                    <h3>OR</h3>
+                    <div class="form-group form-container">
+                        <button type="button" class="btn-secondary-custom" id="cameraBtn">Capture from Camera</button>
+                    </div>
+                    <div class="preview mb-3"></div>
+                    <div class="form-group">
+                        <h2><label>Select Vegetables to Detect</label></h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="vegetables" value="brinjal" id="brinjal">
+                                    <label class="form-check-label" for="brinjal">Brinjal</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="vegetables" value="capsicum" id="capsicum">
+                                    <label class="form-check-label" for="capsicum">Capsicum</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="vegetables" value="cauliflower" id="cauliflower">
+                                    <label class="form-check-label" for="cauliflower">Cauliflower</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="vegetables" value="corn" id="corn">
+                                    <label class="form-check-label" for="corn">Corn</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="vegetables" value="onion" id="onion">
+                                    <label class="form-check-label" for="onion">Onion</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="vegetables" value="potato" id="potato">
+                                    <label class="form-check-label" for="potato">Potato</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-custom btn-block">Upload and Process</button>
+                </form>
+                <p class="vegetable-instructions">Keep the background of the vegetables as plain as possible, with gaps between them, under proper lighting conditions for more accurate results.</p>
+            </div>
+        </div>
+        <footer class="mt-5">
+            <h5>Created by <a href="https://github.com/HARSHA152003/Veggie_Vision">VIT_CH_Boyz</a> | Powered by YOLOv8</h5>
+        </footer>
+    </div>
+    <script>
+        document.getElementById('file').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.querySelector('.preview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" class="img-thumbnail">`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('cameraBtn').addEventListener('click', function() {
+            const video = document.createElement('video');
+            const preview = document.querySelector('.preview');
+            preview.innerHTML = '';
+            preview.appendChild(video);
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+
+                    const captureButton = document.createElement('button');
+                    captureButton.textContent = 'Capture';
+                    captureButton.className = 'btn btn-primary mt-3';
+                    preview.appendChild(captureButton);
+
+                    captureButton.addEventListener('click', function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        const context = canvas.getContext('2d');
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        canvas.toBlob(blob => {
+                            const fileInput = document.getElementById('file');
+                            const file = new File([blob], 'capture.png', { type: 'image/png' });
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            fileInput.files = dataTransfer.files;
+
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                preview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" class="img-thumbnail">`;
+                            };
+                            reader.readAsDataURL(file);
+
+                            stream.getTracks().forEach(track => track.stop());
+                        }, 'image/png');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error accessing camera: ', error);
+                });
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            const checkboxes = document.querySelectorAll('input[name="vegetables"]:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one vegetable to detect.');
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
