@@ -1,17 +1,27 @@
 import os
+import logging
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from ultralytics import YOLO
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-OUTPUT_FOLDER = 'outputs'
+
+# Configure folders and allowed extensions
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
+OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', 'outputs')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 
+# Set up logging
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Load the model
-model_path = r"./best (1).pt"  # Update with your actual model path
+model_path = os.getenv('MODEL_PATH', './best (1).pt')  # Update with your actual model path
 model = YOLO(model_path)
 
 vegetable_properties = {
@@ -33,21 +43,35 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
+        logging.warning("No file part in request")
         return redirect(request.url)
+    
     file = request.files['file']
     if file.filename == '':
+        logging.warning("No file selected")
         return redirect(request.url)
+    
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # Ensure the file is overwritten if it exists
         file.save(filepath)
+        
         selected_vegetables = request.form.getlist('vegetables')
         return redirect(url_for('process_file', filename=filename, selected_vegetables=','.join(selected_vegetables)))
+    
+    logging.warning("Invalid file type")
     return redirect(request.url)
 
 @app.route('/process/<filename>/<selected_vegetables>', methods=['GET'])
 def process_file(filename, selected_vegetables):
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    if not os.path.exists(filepath):
+        logging.error(f"File {filename} not found")
+        return "File not found", 404
+
     results = model.predict(source=filepath)
 
     # Save the image with bounding boxes
@@ -96,6 +120,9 @@ def output_file(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
 
 if __name__ == '__main__':
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-    app.run(debug=True)
+    # Create necessary directories if they do not exist
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
+    
+    # Run the app
+    app.run(debug=False, host='0.0.0.0')  # For deployment, set debug=False and use host='0.0.0.0'
