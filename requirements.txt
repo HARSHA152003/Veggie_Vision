@@ -1,0 +1,3 @@
+Flask==2.3.3
+ultralytics==8.0.79
+python-dotenv==1.0.0
